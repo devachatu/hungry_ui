@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:hungry/models/core/recipe.dart';
 import 'package:hungry/models/helper/recipe_helper.dart';
 import 'package:hungry/views/utils/AppColor.dart';
 import 'package:hungry/views/widgets/modals/search_filter_modal.dart';
 import 'package:hungry/views/widgets/recipe_tile.dart';
+
+import '../../prompts/defined_prompts.dart';
+import '../../services/open_ai_service.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -15,6 +19,36 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   TextEditingController searchInputController = TextEditingController();
   final List<Recipe> searchResult = RecipeHelper.sarchResultRecipe;
+  final OpenAIService openAIService = Get.put(OpenAIService());
+  Map<String, String> replacements = {"ingredients": ""};
+  List<Recipe> sarchResultRecipe = [];
+  bool _loading = false;
+
+  _getSearchItems(List<String> items) async {
+    // Replace placeholders
+    setState(() {
+      _loading = true;
+    });
+    replacements["ingredients"] = items.join(",");
+    String filledString = DefinedPrompts.SEARCH_FROM_INGREDIENTS;
+    replacements.forEach((key, value) {
+      filledString = filledString.replaceAll('{$key}', value);
+    });
+    print(filledString);
+    final response = await openAIService.sendMessage(filledString);
+    List recipeSearchResultRawData = response as List;
+    setState(() {
+      sarchResultRecipe = recipeSearchResultRawData
+          .map((data) => Recipe(
+              title: data['title'],
+              photo: "",
+              calories: data['calories'].toString(),
+              time: data['time'].toString(),
+              description: data['description']))
+          .toList();
+      _loading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +102,7 @@ class _SearchPageState extends State<SearchPage> {
                             controller: searchInputController,
                             onChanged: (value) {
                               print(searchInputController.text);
+
                               setState(() {});
                             },
                             style: TextStyle(
@@ -96,7 +131,7 @@ class _SearchPageState extends State<SearchPage> {
                                     'assets/icons/search.svg',
                                     width: 20,
                                     height: 20,
-                                    color: Colors.white,
+                                    color: Colors.red,
                                   ),
                                 ),
                               ),
@@ -106,17 +141,19 @@ class _SearchPageState extends State<SearchPage> {
                       ),
                       // Filter Button
                       GestureDetector(
-                        onTap: () {
-                          showModalBottomSheet(
-                              context: context,
-                              backgroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(20),
-                                      topRight: Radius.circular(20))),
-                              builder: (context) {
-                                return SearchFilterModal();
-                              });
+                        onTap: () async {
+                          await _getSearchItems(
+                              searchInputController.text.split(","));
+                          // showModalBottomSheet(
+                          //     context: context,
+                          //     backgroundColor: Colors.white,
+                          //     shape: RoundedRectangleBorder(
+                          //         borderRadius: BorderRadius.only(
+                          //             topLeft: Radius.circular(20),
+                          //             topRight: Radius.circular(20))),
+                          //     builder: (context) {
+                          //       return SearchFilterModal();
+                          //     });
                         },
                         child: Container(
                           width: 50,
@@ -126,7 +163,7 @@ class _SearchPageState extends State<SearchPage> {
                             borderRadius: BorderRadius.circular(10),
                             color: AppColor.secondary,
                           ),
-                          child: SvgPicture.asset('assets/icons/filter.svg'),
+                          child: Icon(Icons.search),
                         ),
                       )
                     ],
@@ -187,19 +224,21 @@ class _SearchPageState extends State<SearchPage> {
                     style: TextStyle(color: Colors.grey, fontSize: 12),
                   ),
                 ),
-                ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: searchResult.length,
-                  physics: NeverScrollableScrollPhysics(),
-                  separatorBuilder: (context, index) {
-                    return SizedBox(height: 16);
-                  },
-                  itemBuilder: (context, index) {
-                    return RecipeTile(
-                      data: searchResult[index],
-                    );
-                  },
-                ),
+                _loading
+                    ? CircularProgressIndicator()
+                    : ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: this.sarchResultRecipe.length,
+                        physics: NeverScrollableScrollPhysics(),
+                        separatorBuilder: (context, index) {
+                          return SizedBox(height: 16);
+                        },
+                        itemBuilder: (context, index) {
+                          return RecipeTile(
+                            data: this.sarchResultRecipe[index],
+                          );
+                        },
+                      ),
               ],
             ),
           ),

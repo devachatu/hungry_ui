@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:hungry/models/core/recipe.dart';
 import 'package:hungry/views/screens/full_screen_image.dart';
 import 'package:hungry/views/utils/AppColor.dart';
@@ -8,8 +9,11 @@ import 'package:hungry/views/widgets/ingridient_tile.dart';
 import 'package:hungry/views/widgets/review_tile.dart';
 import 'package:hungry/views/widgets/step_tile.dart';
 
+import '../../prompts/defined_prompts.dart';
+import '../../services/open_ai_service.dart';
+
 class RecipeDetailPage extends StatefulWidget {
-  final Recipe data;
+  Recipe data;
   RecipeDetailPage({required this.data});
 
   @override
@@ -20,15 +24,23 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
     with TickerProviderStateMixin {
   late TabController _tabController;
   late ScrollController _scrollController;
+  final OpenAIService openAIService = Get.find();
+  Map<String, String> replacements = {"dish_name": "", "quantity": "2"};
+  List<Recipe> sarchResultRecipe = [];
+  bool _loading = false;
 
   @override
   void initState() {
     super.initState();
+    replacements["dish_name"] = widget.data.title;
     _tabController = TabController(length: 3, vsync: this);
     _scrollController = ScrollController(initialScrollOffset: 0.0);
     _scrollController.addListener(() {
       changeAppBarColor(_scrollController);
     });
+    _getSearchIngredients();
+    _getSearchRecipe();
+    _getSearchReviews();
   }
 
   Color appBarColor = Colors.transparent;
@@ -59,6 +71,71 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
       return true;
     }
     return false;
+  }
+
+  _getSearchIngredients() async {
+    // Replace placeholders
+    setState(() {
+      _loading = true;
+    });
+    String filledString = DefinedPrompts.DISH_INGREDIENTS_DETAILS;
+    replacements.forEach((key, value) {
+      filledString = filledString.replaceAll('{$key}', value);
+    });
+    print(filledString);
+    final response = await openAIService.sendMessage(filledString);
+    List recipeSearchResultRawData = response as List;
+    setState(() {
+      widget.data.ingridients = recipeSearchResultRawData
+          .map((data) =>
+              Ingridient(name: data['name'], size: data['size'].toString()))
+          .toList();
+      _loading = false;
+    });
+  }
+
+  _getSearchRecipe() async {
+    // Replace placeholders
+    setState(() {
+      _loading = true;
+    });
+    String filledString = DefinedPrompts.DISH_TUTORIAL_DETAILS;
+    replacements.forEach((key, value) {
+      filledString = filledString.replaceAll('{$key}', value);
+    });
+    print(filledString);
+    final response = await openAIService.sendMessage(filledString);
+    List recipeSearchResultRawData = response as List;
+    setState(() {
+      widget.data.tutorial = recipeSearchResultRawData
+          .map((data) => TutorialStep(
+              step: data['step'].toString(),
+              description: data['description'].toString()))
+          .toList();
+      _loading = false;
+    });
+  }
+
+  _getSearchReviews() async {
+    // Replace placeholders
+    setState(() {
+      _loading = true;
+    });
+    String filledString = DefinedPrompts.DISH_REVIEW_DETAILS;
+    replacements.forEach((key, value) {
+      filledString = filledString.replaceAll('{$key}', value);
+    });
+    print(filledString);
+    final response = await openAIService.sendMessage(filledString);
+    List recipeSearchResultRawData = response as List;
+    setState(() {
+      widget.data.reviews = recipeSearchResultRawData
+          .map((data) => Review(
+              username: data['username'].toString(),
+              review: data['review'].toString()))
+          .toList();
+      _loading = false;
+    });
   }
 
   @override
@@ -128,7 +205,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                               },
                               child: Text('cancel'),
                               style: TextButton.styleFrom(
-                                primary: Colors.grey[600],
+                                backgroundColor: Colors.grey[600],
                               ),
                             ),
                           ),
@@ -138,7 +215,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                                 onPressed: () {},
                                 child: Text('Post Review'),
                                 style: ElevatedButton.styleFrom(
-                                  primary: AppColor.primary,
+                                  backgroundColor: AppColor.primary,
                                 ),
                               ),
                             ),
@@ -270,48 +347,50 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
             ),
           ),
           // IndexedStack based on TabBar index
-          IndexedStack(
-            index: _tabController.index,
-            children: [
-              // Ingridients
-              if (widget.data.ingridients != null)
-                ListView.builder(
-                  shrinkWrap: true,
-                  padding: EdgeInsets.zero,
-                  itemCount: widget.data.ingridients!.length,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    return IngridientTile(
-                      data: widget.data.ingridients![index],
-                    );
-                  },
+          _loading
+              ? Center(child: CircularProgressIndicator())
+              : IndexedStack(
+                  index: _tabController.index,
+                  children: [
+                    // Ingridients
+                    if (widget.data.ingridients != null)
+                      ListView.builder(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.zero,
+                        itemCount: widget.data.ingridients!.length,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return IngridientTile(
+                            data: widget.data.ingridients![index],
+                          );
+                        },
+                      ),
+                    // Tutorials
+                    if (widget.data.tutorial != null)
+                      ListView.builder(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.zero,
+                        itemCount: widget.data.tutorial!.length,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return StepTile(
+                            data: widget.data.tutorial![index],
+                          );
+                        },
+                      ),
+                    // Reviews
+                    if (widget.data.reviews != null)
+                      ListView.builder(
+                        shrinkWrap: true,
+                        padding: EdgeInsets.zero,
+                        itemCount: widget.data.reviews!.length,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          return ReviewTile(data: widget.data.reviews![index]);
+                        },
+                      )
+                  ],
                 ),
-              // Tutorials
-              if (widget.data.tutorial != null)
-                ListView.builder(
-                  shrinkWrap: true,
-                  padding: EdgeInsets.zero,
-                  itemCount: widget.data.tutorial!.length,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    return StepTile(
-                      data: widget.data.tutorial![index],
-                    );
-                  },
-                ),
-              // Reviews
-              if (widget.data.reviews != null)
-                ListView.builder(
-                  shrinkWrap: true,
-                  padding: EdgeInsets.zero,
-                  itemCount: widget.data.reviews!.length,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    return ReviewTile(data: widget.data.reviews![index]);
-                  },
-                )
-            ],
-          ),
         ],
       ),
     );

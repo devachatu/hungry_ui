@@ -20,11 +20,13 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: Text('Hungry?', style: TextStyle(fontFamily: 'inter', fontWeight: FontWeight.w700)),
+        title: Text('Hungry?',
+            style: TextStyle(fontFamily: 'inter', fontWeight: FontWeight.w700)),
         showProfilePhoto: true,
         profilePhoto: AssetImage('assets/images/pp.png'),
         profilePhotoOnPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProfilePage()));
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => ProfilePage()));
         },
       ),
       body: ListView(
@@ -47,7 +49,8 @@ class HomePage extends StatelessWidget {
                     // Search Bar
                     DummySearchBar(
                       routeTo: () {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => SearchPage()));
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => SearchPage()));
                       },
                     ),
                     // Delicious Today - Header
@@ -60,14 +63,22 @@ class HomePage extends StatelessWidget {
                         children: [
                           Text(
                             'Delicious Today',
-                            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600, fontFamily: 'inter'),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'inter'),
                           ),
                           TextButton(
                             onPressed: () {
-                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => DeliciousTodayPage()));
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => DeliciousTodayPage()));
                             },
                             child: Text('see all'),
-                            style: TextButton.styleFrom(primary: Colors.white, textStyle: TextStyle(fontWeight: FontWeight.w400, fontSize: 14)),
+                            style: TextButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                textStyle: TextStyle(
+                                    fontWeight: FontWeight.w400, fontSize: 14)),
                           ),
                         ],
                       ),
@@ -88,7 +99,8 @@ class HomePage extends StatelessWidget {
                           );
                         },
                         itemBuilder: (context, index) {
-                          return FeaturedRecipeCard(data: featuredRecipe[index]);
+                          return FeaturedRecipeCard(
+                              data: featuredRecipe[index]);
                         },
                       ),
                     ),
@@ -125,7 +137,8 @@ class HomePage extends StatelessWidget {
                       return SizedBox(width: 16);
                     },
                     itemBuilder: (context, index) {
-                      return RecommendationRecipeCard(data: recommendationRecipe[index]);
+                      return RecommendationRecipeCard(
+                          data: recommendationRecipe[index]);
                     },
                   ),
                 )
@@ -145,14 +158,21 @@ class HomePage extends StatelessWidget {
                   children: [
                     Text(
                       'Newly Posted',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, fontFamily: 'inter'),
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'inter'),
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => NewlyPostedPage()));
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => NewlyPostedPage()));
                       },
                       child: Text('see all'),
-                      style: TextButton.styleFrom(primary: Colors.black, textStyle: TextStyle(fontWeight: FontWeight.w400, fontSize: 14)),
+                      style: TextButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          textStyle: TextStyle(
+                              fontWeight: FontWeight.w400, fontSize: 14)),
                     ),
                   ],
                 ),
