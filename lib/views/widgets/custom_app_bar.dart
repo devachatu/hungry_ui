@@ -23,6 +23,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: AppColor.primary,
       title: title,
       elevation: 0,
+      automaticallyImplyLeading: false,
       actions: [
         Visibility(
           visible: showProfilePhoto,

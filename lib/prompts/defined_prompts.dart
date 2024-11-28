@@ -1,7 +1,8 @@
 class DefinedPrompts {
   static final String SEARCH_FROM_INGREDIENTS =
-      """Give me a list of 10 indian dishes that I can make using the following ingredients:[{ingredients}]. 
-      Give me the response in a JSON format with a list of objects with title, calories, time, description
+      """Give me a list of 10 dishes that I can make using the following ingredients (also consider indian dishes):[{ingredients}]. 
+      Give me the response in a JSON format with a list of objects with title, calories, time, description and suggestions for more ingredients
+      
       """;
 
   static final String DISH_INGREDIENTS_DETAILS =

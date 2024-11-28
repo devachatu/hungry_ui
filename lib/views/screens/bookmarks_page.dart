@@ -25,6 +25,7 @@ class _BookmarksPageState extends State<BookmarksPage> {
         elevation: 0,
         title: Text('Bookmarks',
             style: TextStyle(
+                color: Colors.white,
                 fontFamily: 'inter',
                 fontWeight: FontWeight.w400,
                 fontSize: 16)),

@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:hungry/models/core/recipe.dart';
 import 'package:hungry/models/helper/recipe_helper.dart';
+import 'package:hungry/routes/app_pages.dart';
 import 'package:hungry/views/utils/AppColor.dart';
 import 'package:hungry/views/widgets/modals/search_filter_modal.dart';
 import 'package:hungry/views/widgets/recipe_tile.dart';
@@ -19,9 +20,11 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   TextEditingController searchInputController = TextEditingController();
   final List<Recipe> searchResult = RecipeHelper.sarchResultRecipe;
-  final OpenAIService openAIService = Get.put(OpenAIService());
+  final OpenAIService openAIService = OpenAIService();
   Map<String, String> replacements = {"ingredients": ""};
   List<Recipe> sarchResultRecipe = [];
+  List<String> suggestions = popularRecipeKeyword;
+
   bool _loading = false;
 
   _getSearchItems(List<String> items) async {
@@ -38,14 +41,18 @@ class _SearchPageState extends State<SearchPage> {
     final response = await openAIService.sendMessage(filledString);
     List recipeSearchResultRawData = response as List;
     setState(() {
-      sarchResultRecipe = recipeSearchResultRawData
-          .map((data) => Recipe(
-              title: data['title'],
-              photo: "",
-              calories: data['calories'].toString(),
-              time: data['time'].toString(),
-              description: data['description']))
-          .toList();
+      suggestions = [];
+      sarchResultRecipe = recipeSearchResultRawData.map((data) {
+        for (String element in (data["suggestions"] as List)) {
+          suggestions.add(element);
+        }
+        return Recipe(
+            title: data['title'],
+            photo: "",
+            calories: data['calories'].toString(),
+            time: data['time'].toString(),
+            description: data['description']);
+      }).toList();
       _loading = false;
     });
   }
@@ -60,13 +67,14 @@ class _SearchPageState extends State<SearchPage> {
         centerTitle: true,
         title: Text('Search Recipe',
             style: TextStyle(
+                color: Colors.white,
                 fontFamily: 'inter',
                 fontWeight: FontWeight.w400,
                 fontSize: 16)),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () {
-            Navigator.of(context).pop();
+            Get.toNamed(Routes.home_page);
           },
         ),
         systemOverlayStyle: SystemUiOverlayStyle.dark,
@@ -94,7 +102,7 @@ class _SearchPageState extends State<SearchPage> {
                       Expanded(
                         child: Container(
                           height: 50,
-                          margin: EdgeInsets.only(right: 15),
+                          margin: EdgeInsets.only(right: 15, left: 15),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
                               color: AppColor.primarySoft),
@@ -178,7 +186,7 @@ class _SearchPageState extends State<SearchPage> {
                     scrollDirection: Axis.horizontal,
                     physics: BouncingScrollPhysics(),
                     padding: EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: popularRecipeKeyword.length,
+                    itemCount: suggestions.length,
                     separatorBuilder: (context, index) {
                       return SizedBox(width: 8);
                     },
@@ -187,11 +195,17 @@ class _SearchPageState extends State<SearchPage> {
                         alignment: Alignment.topCenter,
                         child: TextButton(
                           onPressed: () {
-                            searchInputController.text =
-                                popularRecipeKeyword[index];
+                            if (searchInputController.text.isEmpty) {
+                              searchInputController.text = suggestions[index];
+                            } else {
+                              searchInputController.text =
+                                  searchInputController.text +
+                                      ", " +
+                                      suggestions[index];
+                            }
                           },
                           child: Text(
-                            popularRecipeKeyword[index],
+                            suggestions[index],
                             style: TextStyle(
                                 color: Colors.white.withOpacity(0.7),
                                 fontWeight: FontWeight.w400),

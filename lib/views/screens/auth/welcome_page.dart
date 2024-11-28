@@ -29,24 +29,28 @@ class WelcomePage extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.only(left: 16, right: 16, bottom: 32),
               width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height * 60 / 100,
+              height: MediaQuery.of(context).size.height * 80 / 100,
               decoration: BoxDecoration(gradient: AppColor.linearBlackBottom),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 16),
-                        child: Text('Hungry?',
-                            style: TextStyle(
-                                fontFamily: 'inter',
-                                fontWeight: FontWeight.w700,
-                                fontSize: 32,
-                                color: Colors.white)),
+                      Image.asset(
+                        "assets/images/flavor.png",
+                        height: MediaQuery.of(context).size.height * 50 / 100,
                       ),
+                      // Padding(
+                      //   padding: EdgeInsets.only(bottom: 16),
+                      //   child: Text('Flavor Fusion',
+                      //       style: TextStyle(
+                      //           fontFamily: 'inter',
+                      //           fontWeight: FontWeight.w700,
+                      //           fontSize: 32,
+                      //           color: Colors.white)),
+                      // ),
                       Text("Help you when you're hungry",
                           style: TextStyle(color: Colors.white)),
                     ],
@@ -62,7 +66,7 @@ class WelcomePage extends StatelessWidget {
                         child: ElevatedButton(
                           child: Text('Get Started',
                               style: TextStyle(
-                                  color: AppColor.secondary,
+                                  color: Colors.white,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   fontFamily: 'inter')),

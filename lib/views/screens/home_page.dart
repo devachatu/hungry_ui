@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hungry/models/core/recipe.dart';
 import 'package:hungry/models/helper/recipe_helper.dart';
 import 'package:hungry/views/screens/delicious_today_page.dart';
@@ -12,6 +13,8 @@ import 'package:hungry/views/widgets/featured_recipe_card.dart';
 import 'package:hungry/views/widgets/recipe_tile.dart';
 import 'package:hungry/views/widgets/recommendation_recipe_card.dart';
 
+import '../../routes/app_pages.dart';
+
 class HomePage extends StatelessWidget {
   final List<Recipe> featuredRecipe = RecipeHelper.featuredRecipe;
   final List<Recipe> recommendationRecipe = RecipeHelper.recommendationRecipe;
@@ -20,8 +23,11 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: Text('Hungry?',
-            style: TextStyle(fontFamily: 'inter', fontWeight: FontWeight.w700)),
+        title: Text('Flavor Fusion',
+            style: TextStyle(
+                fontFamily: 'inter',
+                fontWeight: FontWeight.w700,
+                color: Colors.white)),
         showProfilePhoto: true,
         profilePhoto: AssetImage('assets/images/pp.png'),
         profilePhotoOnPressed: () {
@@ -49,8 +55,7 @@ class HomePage extends StatelessWidget {
                     // Search Bar
                     DummySearchBar(
                       routeTo: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => SearchPage()));
+                        Get.toNamed(Routes.search_page);
                       },
                     ),
                     // Delicious Today - Header

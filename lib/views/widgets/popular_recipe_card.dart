@@ -82,7 +82,7 @@ class PopularRecipeCard extends StatelessWidget {
                           children: [
                             SvgPicture.asset(
                               'assets/icons/fire-filled.svg',
-                              color: Colors.white,
+                              color: Colors.red,
                               width: 12,
                               height: 12,
                             ),

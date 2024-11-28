@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:hungry/routes/app_pages.dart';
 import 'package:hungry/views/screens/page_switcher.dart';
 import 'package:hungry/views/utils/AppColor.dart';
 import 'package:hungry/views/widgets/custom_text_field.dart';
@@ -59,9 +61,10 @@ class LoginModal extends StatelessWidget {
                 height: 60,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (context) => PageSwitcher()));
+                    // Navigator.of(context).pop();
+                    // Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    //     builder: (context) => PageSwitcher()));
+                    Get.toNamed(Routes.home_page);
                   },
                   child: Text('Login',
                       style: TextStyle(

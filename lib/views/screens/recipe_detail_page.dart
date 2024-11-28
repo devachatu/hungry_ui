@@ -24,7 +24,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
     with TickerProviderStateMixin {
   late TabController _tabController;
   late ScrollController _scrollController;
-  final OpenAIService openAIService = Get.find();
+  TextEditingController reviewController = new TextEditingController();
+  final OpenAIService openAIService = OpenAIService();
   Map<String, String> replacements = {"dish_name": "", "quantity": "2"};
   List<Recipe> sarchResultRecipe = [];
   bool _loading = false;
@@ -153,13 +154,14 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
             centerTitle: true,
             title: Text('Search Recipe',
                 style: TextStyle(
+                    color: Colors.white,
                     fontFamily: 'inter',
                     fontWeight: FontWeight.w400,
                     fontSize: 16)),
             leading: IconButton(
               icon: Icon(Icons.arrow_back_ios, color: Colors.white),
               onPressed: () {
-                Navigator.of(context).pop();
+                Get.back();
               },
             ),
             actions: [
@@ -186,6 +188,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                       height: 150,
                       color: Colors.white,
                       child: TextField(
+                        controller: reviewController,
                         keyboardType: TextInputType.multiline,
                         minLines: 6,
                         decoration: InputDecoration(
@@ -212,7 +215,12 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                           Expanded(
                             child: Container(
                               child: ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  widget.data.reviews!.add(Review(
+                                      username: "@me",
+                                      review: reviewController.text));
+                                  Navigator.of(context).pop();
+                                },
                                 child: Text('Post Review'),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColor.primary,
@@ -271,7 +279,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
                   children: [
                     SvgPicture.asset(
                       'assets/icons/fire-filled.svg',
-                      color: Colors.white,
+                      color: Colors.red,
                       width: 16,
                       height: 16,
                     ),

@@ -25,6 +25,7 @@ class ExplorePage extends StatelessWidget {
         centerTitle: false,
         title: Text('Explore Recipe',
             style: TextStyle(
+                color: Colors.white,
                 fontFamily: 'inter',
                 fontWeight: FontWeight.w400,
                 fontSize: 16)),

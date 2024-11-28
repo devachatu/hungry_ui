@@ -58,7 +58,7 @@ class RecipeTile extends StatelessWidget {
                       children: [
                         SvgPicture.asset(
                           'assets/icons/fire-filled.svg',
-                          color: Colors.black,
+                          color: Colors.red,
                           width: 12,
                           height: 12,
                         ),
