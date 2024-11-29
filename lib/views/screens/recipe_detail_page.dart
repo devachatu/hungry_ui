@@ -39,9 +39,19 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
     _scrollController.addListener(() {
       changeAppBarColor(_scrollController);
     });
-    _getSearchIngredients();
-    _getSearchRecipe();
-    _getSearchReviews();
+    _loadData();
+  }
+
+  _loadData() async {
+    setState(() {
+      _loading = true;
+    });
+    await _getSearchIngredients();
+    await _getSearchRecipe();
+    await _getSearchReviews();
+    setState(() {
+      _loading = false;
+    });
   }
 
   Color appBarColor = Colors.transparent;
@@ -76,9 +86,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
 
   _getSearchIngredients() async {
     // Replace placeholders
-    setState(() {
-      _loading = true;
-    });
     String filledString = DefinedPrompts.DISH_INGREDIENTS_DETAILS;
     replacements.forEach((key, value) {
       filledString = filledString.replaceAll('{$key}', value);
@@ -91,15 +98,11 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
           .map((data) =>
               Ingridient(name: data['name'], size: data['size'].toString()))
           .toList();
-      _loading = false;
     });
   }
 
   _getSearchRecipe() async {
     // Replace placeholders
-    setState(() {
-      _loading = true;
-    });
     String filledString = DefinedPrompts.DISH_TUTORIAL_DETAILS;
     replacements.forEach((key, value) {
       filledString = filledString.replaceAll('{$key}', value);
@@ -113,15 +116,11 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
               step: data['step'].toString(),
               description: data['description'].toString()))
           .toList();
-      _loading = false;
     });
   }
 
   _getSearchReviews() async {
     // Replace placeholders
-    setState(() {
-      _loading = true;
-    });
     String filledString = DefinedPrompts.DISH_REVIEW_DETAILS;
     replacements.forEach((key, value) {
       filledString = filledString.replaceAll('{$key}', value);
@@ -135,7 +134,6 @@ class _RecipeDetailPageState extends State<RecipeDetailPage>
               username: data['username'].toString(),
               review: data['review'].toString()))
           .toList();
-      _loading = false;
     });
   }
 
