@@ -12,6 +12,7 @@ import 'package:hungry/views/widgets/dummy_search_bar.dart';
 import 'package:hungry/views/widgets/featured_recipe_card.dart';
 import 'package:hungry/views/widgets/recipe_tile.dart';
 import 'package:hungry/views/widgets/recommendation_recipe_card.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../routes/app_pages.dart';
 
@@ -19,6 +20,7 @@ class HomePage extends StatelessWidget {
   final List<Recipe> featuredRecipe = RecipeHelper.featuredRecipe;
   final List<Recipe> recommendationRecipe = RecipeHelper.recommendationRecipe;
   final List<Recipe> newlyPostedRecipe = RecipeHelper.newlyPostedRecipe;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

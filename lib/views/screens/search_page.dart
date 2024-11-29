@@ -6,7 +6,6 @@ import 'package:hungry/models/core/recipe.dart';
 import 'package:hungry/models/helper/recipe_helper.dart';
 import 'package:hungry/routes/app_pages.dart';
 import 'package:hungry/views/utils/AppColor.dart';
-import 'package:hungry/views/widgets/modals/search_filter_modal.dart';
 import 'package:hungry/views/widgets/recipe_tile.dart';
 
 import '../../prompts/defined_prompts.dart';
@@ -27,6 +26,19 @@ class _SearchPageState extends State<SearchPage> {
 
   bool _loading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    suggestions.shuffle();
+    if (Get.arguments != null) {
+      for (var element in Get.arguments) {
+        searchInputController.text =
+            searchInputController.text + element + " , ";
+      }
+      _getSearchItems((Get.arguments as List<String>));
+    }
+  }
+
   _getSearchItems(List<String> items) async {
     // Replace placeholders
     setState(() {
@@ -44,7 +56,7 @@ class _SearchPageState extends State<SearchPage> {
       suggestions = [];
       sarchResultRecipe = recipeSearchResultRawData.map((data) {
         for (String element in (data["suggestions"] as List)) {
-          suggestions.add(element);
+          if (!suggestions.contains(element)) suggestions.add(element);
         }
         return Recipe(
             title: data['title'],
